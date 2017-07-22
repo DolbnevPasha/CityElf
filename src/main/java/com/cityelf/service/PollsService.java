@@ -32,14 +32,20 @@ public class PollsService {
     if (!addressesRepository.exists(addressId)) {
       throw new AddressNotPresentException();
     }
-    return pollsRepository.findByAddressId(addressId);
+    List<Poll> polls = pollsRepository.findByAddressId(addressId);
+    for (Poll poll : polls) {
+      poll.setPollsAnswers(pollAnswersRepository.findByPollId(poll.getId()));
+    }
+    return polls;
   }
 
   public Poll getPollById(long id) throws PollNotFoundException {
     if (pollsRepository.findOne(id) == null) {
       throw new PollNotFoundException();
     }
-    return pollsRepository.findOne(id);
+    Poll poll = pollsRepository.findOne(id);
+    poll.setPollsAnswers(pollAnswersRepository.findByPollId(poll.getId()));
+    return poll;
   }
 
   @Transactional
